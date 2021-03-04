@@ -1,27 +1,47 @@
-describe('Is site online and navigable?', () => {
-  it('Is Home ok?', () => {
-    cy.visit('/');
+describe("Simple Login", () => {
+  it("should show the login popup", () => {
+    cy.visit(`${Cypress.env("site_url")}/home`);
+    cy.get(".header-button.header-button-login").click();
+    cy.get(".login-container-02").should("be.visible");
   });
 
-  it('Is it navigable?', () => {
-    cy.visit("/")
-      .its('.lightbox')
-      .then($lightbox => {
-        cy.get('.lightbox').click(150, 150);
-        cy.get(
-          ':nth-child(6) > .frame-center > .mediaCarousel > .frame-container > .frame > .items > [mediaid="149392"] > .mediaContainer > a > .mediaCover > .media-image > img'
-        ).click();
-        cy.contains('Ver mais detalhes').click();
-        cy.url().should('contain', 'filme');
-        cy.go('back');
-      });
+  it("shouldn't sign in with invalid credentials", () => {
+    cy.get(".login-container-02").should("be.visible");
+    cy.get("#UserName").type("invalid@email.com");
+    cy.get(":nth-child(2) > #Password").type("invalid@email.com");
+    cy.get("#modal-looke > .login-button").click();
+
+    cy.get("#modal-looke > .login-invalid").should("be.visible");
+    cy.get("#modal-looke > .login-invalid").contains(
+      "Usuário ou senha inválidos"
+    );
   });
 
-  it('Fechar a lightbox', () => {
-    cy.get('body')
-      .its('.lightbox')
-      .then($lightbox => {
-        cy.get('.lightbox').click(150, 150);
-      });
+  it("should sign in with valid credentials", () => {
+    /*    cy.visit(`${Cypress.env("site_url")}/`);
+        
+            cy.get(
+                "[mediaid=67238]"
+              ).click();
+        
+            cy.get('.detailTitle').should('have.text', 'Crimes Obscuros');
+        
+            cy.url().should('contain', 'filmes').should('contain', 'crimes-obscuros');
+        
+            cy.go('back');
+        */
+
+    cy.visit(`${Cypress.env("site_url")}/home`);
+    cy.get(".header-button.header-button-login").click();
+    cy.get(".login-container-02").should("be.visible");
+
+    cy.get(".login-container-02").should("be.visible");
+    cy.get("#UserName").type("contato@wilsonneto.com.br");
+    cy.get(":nth-child(2) > #Password").type("contato@wilsonneto.com.br");
+    cy.get("#modal-looke > .login-button").click();
+    
+    cy.visit(`${Cypress.env("site_url")}/home`);
+    console.log(cy.getCookie('LOOKE'));
+    cy.getCookie('LOOKE').should('have.property', 'value', "EncUserID=39772856754BD95135AF41DF24448C73&PlanID=-1&SubPlanID=0&Login.FirstName=Wilsongomes03&FullName=Wilsongomes03 BatistaRamos4&Email=contato@wilsonneto.com.br")
   });
 });
